@@ -25,7 +25,7 @@ OSDescription=$(lsb_release -d --short)
 OSArch=$(uname -m)
 
 PROJECTPATH=$(cd `dirname $0`; pwd)
-CAR_COLOR=$(cat ${PROJECTPATH}/../scorpio.txt)
+CAR_COLOR=$(cat /opt/scorpio.txt)
 echo ${CAR_COLOR}
 if [[ "${CAR_COLOR}" == "silver" ]]; then
 	RED_CAR="false"
@@ -176,6 +176,27 @@ let_robot_go(){
 }
 
 
+scorpio_test_mode(){
+	PROJECTPATH=$(cd `dirname $0`; pwd)
+	source ${PROJECTPATH}/devel/setup.bash	
+	echo -e "${Info}老化测试程序，请将悬挂起来，轮子不要着地进行测试，请选择：
+	1.执行5分钟的检测功能；
+        2.执行老化检测功能，直至断电。"
+        echo -e "${Info}退出请输入：Ctrl + c " 
+	echo && stty erase ^? && read -p "请选择 1 或 2 ：" chnum
+ 	case "$chnum" in
+		1)
+		roslaunch scorpio_test all_run_test_st.launch model_red:=${RED_CAR}	
+		;;
+		2)
+		roslaunch scorpio_test all_run_test.launch model_red:=${RED_CAR}	
+		;;
+		*)
+		echo -e "${Error} 退出!"	
+		;;
+	esac
+}
+
 #远程（手机APP）控制scorpio
 remote_control_robot(){
 	master_uri_setup
@@ -191,7 +212,7 @@ remote_control_robot(){
 	echo -e "${Info}" 
 	echo && stty erase ^? && read -p "按回车键（Enter）开始：" 
 
-	roslaunch scorpio_teleop app_op.launch model_red:=${RED_CAR}
+	roslaunch scorpio_teleop app_op_remote.launch model_red:=${RED_CAR}
 }
 
 #让scorpio跟着你走
@@ -265,7 +286,7 @@ scorpio_navigation_3d(){
 	echo -e "${Info}" 
 	echo && stty erase ^? && read -p "按回车键（Enter）开始：" 
 	if [[ "${SLAMTYPE}" == "2d" ]]; then
-		roslaunch scorpio_navigation amcl_demo_rviz.launch model_red:=${RED_CAR}
+		roslaunch scorpio_navigation scorpio_navigation_camera.launch model_red:=${RED_CAR}
 	else
 		roslaunch scorpio_rtabmap scorpio_rtabmap_nav.launch model_red:=${RED_CAR}
 	fi	
@@ -306,6 +327,47 @@ scorpio_build_map_2d(){
 
 	roslaunch scorpio_slam 2d_slam_teleop.launch slam_methods_tel:=${SLAMTYPE} model_red:=${RED_CAR} 
 	
+}
+qrcode_transfer_files(){
+	echo -e "${Info}" 
+	echo -e "${Info}通过局域网收发文件" 
+	echo -e "${Info}" 
+	echo -e "${Info}请选择：
+	  ${Green_font_prefix}1.${Font_color_suffix} 发送文件（文件名，带上文件绝对路径）
+	  ${Green_font_prefix}2.${Font_color_suffix} 接收文件（默认存放在~/Downloads路径中）
+	  ${Green_font_prefix}3.${Font_color_suffix} 退出请输入：Ctrl + c" 
+	echo && stty erase ^? && read -p "请输入数字 [1-2]：" cnum
+	case "$cnum" in
+		1)
+		echo -e "${Info}请输入文件名，带上文件绝对路径，如 /home/scorpio/a.jpg：
+		 退出请输入：Ctrl + c" 
+		echo && stty erase ^? && read -p "请输入要发送的文件：" s_file
+		if [ -f "$s_file" ]; then
+			echo -e "${Info}本机即将发送文件：${Green_font_prefix}"$s_file"${Font_color_suffix}，请接收端扫码或者直接输入下面的网址接收文件"
+		else 
+			echo -e "${Info}请输入带绝对路径的文件名"
+			exit
+		fi
+		
+		qrcp send $s_file
+		;;
+		2)
+		echo -e "${Info}请输入接收到的文件存放的路径，默认为 /home/scorpio/Downloads：
+		退出请输入：Ctrl + c" 
+		echo && stty erase ^? && read -p "请输入文件存放的文件夹路径：" s_file
+		if [ -d "$s_file" ]; then
+			echo ""
+		else 
+			echo -e "${Info}${Red_font_prefix}文件夹不存在，将存放在默认文件夹/home/scorpio/Downloads中${Font_color_suffix}"
+			s_file="/home/scorpio/Downloads"
+		fi
+		echo -e "${Info}接收的文件将存放在：${Green_font_prefix}"$s_file"${Font_color_suffix}，目录下，请发送端扫码或者直接输入下面的网址选择文件发送"
+		qrcp receive --output=$s_file
+		;;
+		*)
+		echo -e "${Error} 错误，退出"
+		;;
+	esac
 }
 
 #让scorpio使用深度摄像头绘制地图
@@ -361,6 +423,27 @@ scorpio_build_map_3d(){
 	
 }
 
+clear_user_data(){
+	PROJECTPATH=$(cd `dirname $0`; pwd)
+	source ${PROJECTPATH}/devel/setup.bash
+
+	echo -e "${Info}" 
+	echo -e "${Info}    清除用户数据"
+	echo -e "${Info}将会删掉地图数据，ROS的log记录,和浏览器的所有数据"
+
+	echo && stty erase ^? && read -p "请选择是否继续y/n：" choose
+
+	if [[ "${choose}" == "y" ]]; then
+                rm -fr ${PROJECTPATH}/map*
+		rm -fr ~/.ros/*
+		rm -fr ~/.mozilla/firefox/*
+		rosclean purge -y
+		echo -e "${Info}    已清除用户数据"
+	else
+		return
+	fi
+
+}
 coming_soon(){
 	echo -e "${Tip} coming_soon!" 
 }
@@ -408,6 +491,8 @@ echo -e "--------------分隔线----------------
   ${Green_font_prefix}101.${Font_color_suffix} 完整安装
   ${Green_font_prefix}102.${Font_color_suffix} 单独安装ROS环境
   ${Green_font_prefix}103.${Font_color_suffix} 单独安装scorpio依赖
+  ${Green_font_prefix}104.${Font_color_suffix} 文件传输
+  ${Green_font_prefix}105.${Font_color_suffix} 清除用户数据
  "
 menu_status
 echo && stty erase ^? && read -p "请输入数字：" num
@@ -436,6 +521,9 @@ case "$num" in
 	7)
 	scorpio_navigation_3d
 	;;
+	98)
+	scorpio_test_mode
+	;;
 	100)
 	tell_us
 	;;
@@ -448,6 +536,12 @@ case "$num" in
 	103)
 	install_scorpio_require
 	;;
+	104)
+	qrcode_transfer_files
+	;;
+	105)
+	clear_user_data
+	;;	
 	*)
 	echo -e "${Error} 请输入正确的数字 "
 	;;

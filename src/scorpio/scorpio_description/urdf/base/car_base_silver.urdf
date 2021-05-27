@@ -45,8 +45,10 @@
 		  <geometry>
 		    <mesh
 		      filename="package://scorpio_description/meshes/scorpio/base/scorpio.stl" scale="0.001 0.001 0.001"/>
-		  </geometry>
-		  
+		  </geometry>	
+		      <material name = "white">
+			  <color rgba = "1 1 1 1"/>
+		     </material>  
 		</visual>
 		<collision>
 		  <origin
@@ -56,6 +58,9 @@
 		    <mesh
 		      filename="package://scorpio_description/meshes/scorpio/base/scorpio.stl" scale="0.001 0.001 0.001"/>
 		  </geometry>
+		      <material name = "white">
+			  <color rgba = "1 1 1 1"/>
+		     </material>
 		</collision>	
 	</link>	
 
@@ -84,7 +89,9 @@
 		    <mesh
 		      filename="package://scorpio_description/meshes/scorpio/base/left_wheel.stl" scale="0.001 0.001 0.001"/>
 		  </geometry>
-		  
+		      <material name = "black">
+			  <color rgba = "0.4 0.4 0.4 1"/>
+		     </material>		  
 		</visual>
 		<collision>
 		  <origin
@@ -94,6 +101,9 @@
 		    <mesh
 		      filename="package://scorpio_description/meshes/scorpio/base/left_wheel.stl" scale="0.001 0.001 0.001"/>
 		  </geometry>
+		      <material name = "black">
+			  <color rgba = "0.4 0.4 0.4 1"/>
+		     </material>
 		</collision>	
 	</link>  
 	
@@ -130,7 +140,9 @@
 		    <mesh
 		      filename="package://scorpio_description/meshes/scorpio/base/right_wheel.stl" scale="0.001 0.001 0.001"/>
 		  </geometry>
-		  
+		      <material name = "black">
+			  <color rgba = "0.4 0.4 0.4 1"/>
+		     </material>		  
 		</visual>
 		<collision>
 		  <origin
@@ -141,6 +153,9 @@
 
 		      filename="package://scorpio_description/meshes/scorpio/base/right_wheel.stl" scale="0.001 0.001 0.001"/>
 		  </geometry>
+		      <material name = "black">
+			  <color rgba = "0.4 0.4 0.4 1"/>
+		     </material>
 		</collision>	
 	</link>   
 	
@@ -175,7 +190,9 @@
 		    <mesh
 		      filename="package://scorpio_description/meshes/scorpio/base/left_wheel.stl" scale="0.001 0.001 0.001"/>
 		  </geometry>
-		  
+		      <material name = "black">
+			  <color rgba = "0.4 0.4 0.4 1"/>
+		     </material>		  
 		</visual>
 		<collision>
 		  <origin
@@ -185,6 +202,9 @@
 		    <mesh
 		      filename="package://scorpio_description/meshes/scorpio/base/left_wheel.stl" scale="0.001 0.001 0.001"/>
 		  </geometry>
+		      <material name = "black">
+			  <color rgba = "0.4 0.4 0.4 1"/>
+		     </material>
 		</collision>	
 	</link>  
 	
@@ -220,7 +240,9 @@
 		    <mesh
 		      filename="package://scorpio_description/meshes/scorpio/base/right_wheel.stl" scale="0.001 0.001 0.001"/>
 		  </geometry>
-		  
+		      <material name = "black">
+			  <color rgba = "0.4 0.4 0.4 1"/>
+		     </material>		  
 		</visual>
 		<collision>
 		  <origin
@@ -230,6 +252,9 @@
 		    <mesh
 		      filename="package://scorpio_description/meshes/scorpio/base/right_wheel.stl" scale="0.001 0.001 0.001"/>
 		  </geometry>
+		      <material name = "black">
+			  <color rgba = "0.4 0.4 0.4 1"/>
+		     </material>
 		</collision>	
 	</link>   
 	

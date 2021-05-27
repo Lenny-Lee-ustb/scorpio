@@ -79,8 +79,8 @@ public:
 
     min_x_ = -0.2;
     max_x_ = 0.2;
-    min_y_ = -0.1;
-    max_y_ = 0.3;
+    min_y_ = 0.2;//-0.1;
+    max_y_ = 0.4;//0.3;
     max_z_ = 1.5;
     goal_z_ = 0.7;
     z_scale_ = 0.8;
@@ -89,7 +89,7 @@ public:
     x_thre = 0.05;
     y_thre = 0.087222222;
 
-    max_vx = 0.4;
+    max_vx = 0.4;   //定义最大的线性速度
     max_vz = 0.8;
 
     max_depth_ = 2;
@@ -98,19 +98,18 @@ public:
     depth_thre = 0.1;
     y_thre = 0.087222222;
 
-    if (nhandle.getParam("depth_topic", depth_topic)) 
+    if (nhandle.getParam("/nxfollower_nodelet/depth_topic", depth_topic)) 
     {
    	    if(depth_topic.empty())
 	    {
 			depth_topic = "/camera/depth/points";
     	}
 	}
-	ROS_INFO("====depth_topic is %s!", depth_topic.c_str());
-	printf("====depth_topic is %s!/n", depth_topic.c_str());
+	ROS_INFO("depth_topic is %s!", depth_topic.c_str());
     // public the cmd_vel message
     cmdvel_pub = nhandle.advertise<geometry_msgs::Twist>("/raw_cmd_vel", 1);
     // subscribe the point clound
-    cloud_sub = nhandle.subscribe<PointCloud>("/camera/depth/points", 1, &NxFollowerNode::pointCloudCb, this); ///camera/depth/points
+    cloud_sub = nhandle.subscribe<PointCloud>(depth_topic, 1, &NxFollowerNode::pointCloudCb, this); ///camera/depth/points
   }
 
   virtual ~NxFollowerNode()
@@ -130,7 +129,7 @@ public:
     for (int kk = 0; kk < cloud->points.size(); kk++)
     {
       pt = cloud->points[kk];
-      if (!std::isnan(x) && !std::isnan(y) && !std::isnan(z))
+      if ((!std::isnan(x) && !std::isnan(y) && !std::isnan(z))&&(!std::isinf(pt.x) && !std::isinf(pt.y) && !std::isinf(pt.z)))
       {
         if (-pt.y > min_y_ && -pt.y < max_y_ && pt.x < max_x_ && pt.x > min_x_ && pt.z < max_z_)
         {
@@ -156,7 +155,8 @@ public:
     }
     else
     {
-      cmdvel_pub.publish(geometry_msgs::TwistPtr(new geometry_msgs::Twist()));
+      pubCmd(0, 0);
+	//cmdvel_pub.publish(geometry_msgs::TwistPtr(new geometry_msgs::Twist()));
     }
   }
 
@@ -184,7 +184,10 @@ public:
     geometry_msgs::TwistPtr cmd(new geometry_msgs::Twist());
     cmd->linear.x = x_linear;
     cmd->angular.z = z_angular;
-
+    if(cmd->linear.x > max_vx)
+	  cmd->linear.x = max_vx;
+    else if(cmd->linear.x < -max_vx)
+	  cmd->linear.x = -max_vx;
     cmdvel_pub.publish(cmd);
   }
 
