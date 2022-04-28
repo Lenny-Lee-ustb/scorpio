@@ -12,6 +12,7 @@ qtcreator-*
 *.log
 intel
 .catkin_workspace
+.vecode/
 
 >>>>>>> fsm_ngh_beta
 build-simple_goals-Desktop-Default/
