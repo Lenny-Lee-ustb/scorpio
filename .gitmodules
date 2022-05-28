@@ -1,0 +1,3 @@
+[submodule "src/follow_waypoints"]
+	path = src/follow_waypoints
+	url = https://github.com/Lenny-Lee-ustb/follow_waypoints.git

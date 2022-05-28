@@ -30,10 +30,12 @@ void cmdVelReceived(const geometry_msgs::Twist::ConstPtr &cmd_vel)
 {
 	float steering;
 	ackermann_msgs::AckermannDriveStamped msg;
-	steering = convert_trans_rot_vel_to_steering_angle(cmd_vel->linear.x, cmd_vel->angular.z, wheelbase);
+	// steering = convert_trans_rot_vel_to_steering_angle(cmd_vel->linear.x, cmd_vel->angular.z, wheelbase);
+	
 
 	msg.header.stamp = ros::Time::now();
 	msg.header.frame_id = frame_id;
+	steering = cmd_vel->angular.z;
 	msg.drive.steering_angle = steering;
 	msg.drive.speed = cmd_vel->linear.x;
 	
